@@ -47,6 +47,63 @@ public:
 		}
 	}
 
+	VarCut(string config_str)
+	{
+		//Assumes config_str is formatted as
+		//config_str = "name:expr:edges[0]:...:edges[num_edges-1]"
+		
+		int i = 0;
+		
+		name = "";
+		while(i < config_str.length())
+		{
+			if(config_str.substr(i, 1) == ":")break;
+
+			name += config_str.substr(i, 1);
+			i++;
+		}
+		i++;
+
+		expr = "";
+		while(i < config_str.length())
+		{
+			if(config_str.substr(i, 1) == ":")break;
+
+			expr += config_str.substr(i, 1);
+			i++;
+		}
+		i++;
+
+		string temp1 = "";
+		while(i < config_str.length())
+		{
+			if(config_str.substr(i, 1) == ":")break;
+
+			temp1 += config_str.substr(i, 1);
+			i++;
+		}
+		i++;
+
+		string temp2 = "";
+		while(i < config_str.length())
+		{
+			if(config_str.substr(i, 1) == ":")
+			{
+				bounds.push_back(pair<float, float>(stof(temp1), stof(temp2)));
+				temp1 = temp2;
+				temp2 = "";
+			}
+			else
+			{
+				temp2 += config_str.substr(i, 1);
+			}
+
+			i++;
+		}
+
+		bounds.push_back(pair<float, float>(stof(temp1), stof(temp2)));
+	}
+
 	float min(int i)
 	{
 		if(i < 0)
@@ -83,6 +140,11 @@ public:
 		return bounds[i].second;
 	}
 
+	int Size()
+	{
+		return bounds.size();
+	}
+
 	void AddBound(float min, float max)
 	{
 		bounds.push_back(pair<float, float>(min, max));
@@ -101,9 +163,10 @@ public:
 	CommonFunctions<float>* cf = {};
 	TNtuple* nt;
 
-	vector<VarCut> var_cuts;
+	//Maybe wrap these into a vector<tuple<VarCut, int, StrFunction<float>*>>?
+	vector<VarCut> var_cuts = {};
 	vector<StrFunction<float>*> var_funcs = {};
-	vector<int> indexes;
+	vector<int> indexes = {};
 
 	Cutter()
 	{
@@ -115,19 +178,8 @@ public:
 		b = false;
 	}
 
-	void AddCut(VarCut vc)
+	void Free()
 	{
-		var_cuts.push_back(vc);
-		indexes.push_back(0);
-	}
-
-	void SetNtuple(TNtuple* ntuple)
-	{
-		//This must be called AFTER addressing the branches of tree in the main program
-		//With some extra trickery, though, it might not have to but I'm not doing that just yet
-		
-		nt = ntuple;
-
 		//Free memory that would have been allocated previously
 		for(i = 0; i < (int)var_funcs.size(); i++)
 		{
@@ -135,7 +187,51 @@ public:
 			delete var_funcs[i];
 		}
 		var_funcs.clear();
-		for(i = 0; i < (int)var_cuts.size(); i++)
+	}
+
+	void AddCut(VarCut vc)
+	{
+		var_cuts.push_back(vc);
+		indexes.push_back(0);
+	}
+
+	int NumCuts()
+	{
+		return var_cuts.size();
+	}
+
+	int NumBins()
+	{
+		j = 1;
+		for(i = 0; i < NumCuts(); i++)
+		{
+			j *= var_cuts[i].Size();
+		}
+
+		return j;
+	}
+
+	void Index(int k)
+	{
+		j = NumBins();
+		
+		for(i = NumCuts()-1; i >= 0; i--)
+		{
+			j /= var_cuts[i].Size();
+			indexes[i] = (int)(k / j);
+			k %= j;
+		}
+	}
+
+	void SetNtuple(TNtuple* ntuple)
+	{
+		//This must be called AFTER addressing the branches of tree in the main program
+		//With some extra trickery, though, it might not have to but I'm not doing that just yet
+		Free();
+
+		nt = ntuple;
+
+		for(i = 0; i < NumCuts(); i++)
 		{
 			var_funcs.push_back(new StrFunction<float>(var_cuts[i].expr, cf->common_funcs, nt));
 		}
@@ -146,13 +242,13 @@ public:
 		if(nt == 0x0)
 		{
 			cout << "In Cutter::Check(vector<int> indexes):" << endl;
-			cout << "TTree* t was null during call" << endl;
+			cout << "TNtuple* nt was null during call" << endl;
 			cout << "Returning false" << endl;
 			return false;
 		}
 
 		b = true;
-		for(i = 0; i < var_cuts.size(); i++)
+		for(i = 0; i < NumCuts(); i++)
 		{
 			j = indexes[i];
 			f = var_funcs[i]->Evaluate();
@@ -184,6 +280,12 @@ public:
 			}
 			strcat(c, temp);
 		}
+	}
+
+	~Cutter()
+	{
+		Free();
+		delete cf;
 	}
 };
 
