@@ -18,7 +18,6 @@
 #include "TF1.h"
 
 //Local includes
-#include "StrFunction.h"
 #include "CommonFunctions.h"
 
 //Definitions
