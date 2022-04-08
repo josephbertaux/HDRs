@@ -1,5 +1,5 @@
-#ifndef CUTTER_H
-#define CUTTER_H
+#ifndef BINNER_H
+#define BINNER_H
 
 //Standard includes
 #include <iostream>
@@ -25,15 +25,15 @@ static int MAX_CHAR_LEN = 256;
 
 using namespace std;
 
-class VarCut
+class VarBins
 {
 public:
 	string name; //The name of the cut when writing short strings to specify the range used for a specific application of this cut
 	string expr; //The name of a branch (or StrFunction expression of branches) used to compare to bin edges
 
-	vector<pair<float, float>> bounds; //The edges of bins
+	vector<pair<float, float>> bins; //The edges of bins
 
-	VarCut(string n, string expression, int num_edges, float edges[])
+	VarBins(string n, string expression, int num_edges, float edges[])
 	{
 		//edges assumed to have size num_bins + 1
 
@@ -42,11 +42,11 @@ public:
 
 		for(int i = 0; i < num_edges-1; i++)
 		{
-			bounds.push_back(pair<float, float>(edges[i], edges[i+1]));
+			bin.push_back(pair<float, float>(edges[i], edges[i+1]));
 		}
 	}
 
-	VarCut(string config_str)
+	VarBins(string config_str)
 	{
 		//Assumes config_str is formatted as
 		//config_str = "name:expr:edges[0]:...:edges[num_edges-1]"
@@ -88,7 +88,7 @@ public:
 		{
 			if(config_str.substr(i, 1) == ":")
 			{
-				bounds.push_back(pair<float, float>(stof(temp1), stof(temp2)));
+				bins.push_back(pair<float, float>(stof(temp1), stof(temp2)));
 				temp1 = temp2;
 				temp2 = "";
 			}
@@ -100,7 +100,7 @@ public:
 			i++;
 		}
 
-		bounds.push_back(pair<float, float>(stof(temp1), stof(temp2)));
+		bins.push_back(pair<float, float>(stof(temp1), stof(temp2)));
 	}
 
 	float min(int i)
@@ -111,14 +111,14 @@ public:
 			cout << "i < 0, using i = 0" << endl;
 			i = 0;
 		}
-		if(i > (int)bounds.size() - 1)
+		if(i > (int)bins.size() - 1)
 		{
 			cout << "In VarCut::min(int i):" << endl;
 			cout << "i > bounds.size()-1, using i = bounds.size()-1" << endl;
-			i = (int)bounds.size() - 1;
+			i = (int)bins.size() - 1;
 		}
 
-		return bounds[i].first;
+		return bins[i].first;
 	}
 
 	float max(int i)
@@ -129,22 +129,22 @@ public:
 			cout << "i < 0, using i = 0" << endl;
 			i = 0;
 		}
-		if(i > (int)bounds.size() - 1)
+		if(i > (int)bins.size() - 1)
 		{
 			cout << "In VarCut::max(int i):" << endl;
 			cout << "i > bounds.size()-1, using i = bounds.size()-1" << endl;
-			i = (int)bounds.size() - 1;
+			i = (int)bins.size() - 1;
 		}
 
-		return bounds[i].second;
+		return bins[i].second;
 	}
 
 	int Size()
 	{
-		return bounds.size();
+		return bins.size();
 	}
 
-	void AddBound(float min, float max)
+	void AddBin(float min, float max)
 	{
 		bounds.push_back(pair<float, float>(min, max));
 	}
@@ -152,7 +152,7 @@ public:
 
 
 
-class Cutter
+class Binner
 {
 private:
 	int i, j;
@@ -163,11 +163,11 @@ public:
 	TNtuple* nt;
 
 	//Maybe wrap these into a vector<tuple<VarCut, int, StrFunction<float>*>>?
-	vector<VarCut> var_cuts = {};
+	vector<VarBins> var_bins = {};
 	vector<StrFunction<float>*> var_funcs = {};
 	vector<int> indexes = {};
 
-	Cutter()
+	Binner()
 	{
 		cf = new CommonFunctions<float>();
 		nt = 0x0;		
@@ -188,23 +188,23 @@ public:
 		var_funcs.clear();
 	}
 
-	void AddCut(VarCut vc)
+	void AddVar(VarBins vb)
 	{
-		var_cuts.push_back(vc);
+		var_bins.push_back(vb);
 		indexes.push_back(0);
 	}
 
-	int NumCuts()
+	int NumVars()
 	{
-		return var_cuts.size();
+		return var_bins.size();
 	}
 
 	int NumBins()
 	{
 		j = 1;
-		for(i = 0; i < NumCuts(); i++)
+		for(i = 0; i < NumVars(); i++)
 		{
-			j *= var_cuts[i].Size();
+			j *= var_bins[i].Size();
 		}
 
 		return j;
@@ -214,9 +214,9 @@ public:
 	{
 		j = NumBins();
 		
-		for(i = NumCuts()-1; i >= 0; i--)
+		for(i = NumVars()-1; i >= 0; i--)
 		{
-			j /= var_cuts[i].Size();
+			j /= var_bins[i].Size();
 			indexes[i] = (int)(k / j);
 			k %= j;
 		}
@@ -230,9 +230,9 @@ public:
 
 		nt = ntuple;
 
-		for(i = 0; i < NumCuts(); i++)
+		for(i = 0; i < NumVars(); i++)
 		{
-			var_funcs.push_back(new StrFunction<float>(var_cuts[i].expr, cf->common_funcs, nt));
+			var_funcs.push_back(new StrFunction<float>(var_bins[i].expr, cf->common_funcs, nt));
 		}
 	}
 
@@ -247,7 +247,7 @@ public:
 		}
 
 		b = true;
-		for(i = 0; i < NumCuts(); i++)
+		for(i = 0; i < NumBins(); i++)
 		{
 			j = indexes[i];
 			f = var_funcs[i]->Evaluate();
@@ -261,11 +261,11 @@ public:
 	{
 		char temp[MAX_CHAR_LEN];
 		strcpy(c, "");
-		for(i = 0; i < var_cuts.size(); i++)
+		for(i = 0; i < var_bins.size(); i++)
 		{
 			j = indexes[i];
 
-			sprintf(temp, f.c_str(), var_cuts[i].name.c_str(), var_cuts[i].min(j), var_cuts[i].max(j));
+			sprintf(temp, f.c_str(), var_bins[i].name.c_str(), var_bins[i].min(j), var_bins[i].max(j));
 			for(j = 0; j < MAX_CHAR_LEN; j++)
 			{
 				if(temp[j] == '+' or temp[j] == '.')
