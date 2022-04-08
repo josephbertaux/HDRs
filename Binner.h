@@ -371,8 +371,8 @@ public:
 
 		branch_vals = 0x0;
 
-		string config_str
-		ifstream config(config_filename)
+		string config_str;
+		ifstream config(config_filename);
 		while(true)
 		{
 			config >> config_str;
