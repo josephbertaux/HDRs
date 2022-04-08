@@ -59,7 +59,46 @@ vector<string> GetExprArgs(string expr)
 	return args;
 }
 
-//GetExprVars
+vector<string> GetExprVars(string expr)
+{
+	vector<string> vars = {};
+	
+	vector<string> args = GetExprArgs(expr);
+	if(args.size() > 0)
+	{
+		int i, j, k;
+		bool b;
+
+		vector<string> chld_vars;
+		for(i = 0; i < args.size(); i++)
+		{
+			chld_vars = GetExprVars(args[i]);
+			for(j = 0; j < chld_vars.size(); j++)
+			{
+				b = true;
+				for(k = 0; k < vars.size(); k++)
+				{
+					if(chld_vars[j] == vars[k])
+					{
+						b = false;
+						break;
+					}
+				}
+				if(b)
+				{
+					vars.push_back(chld_vars[j]);
+				}
+			}
+			chld_vars.clear();
+		}
+	}
+	else
+	{
+		vars.push_back(expr);
+	}
+
+	return vars;	
+}
 
 template <class T>
 class NamedFunction

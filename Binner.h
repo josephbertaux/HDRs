@@ -25,7 +25,7 @@ static int MAX_CHAR_LEN = 256;
 
 using namespace std;
 
-class VarBins
+class VarBinner
 {
 public:
 	string name; //The name of the cut when writing short strings to specify the range used for a specific application of this cut
@@ -33,7 +33,7 @@ public:
 
 	vector<pair<float, float>> bins; //The edges of bins
 
-	VarBins(string n, string expression, int num_edges, float edges[])
+	VarBinner(string n, string expression, int num_edges, float edges[])
 	{
 		//edges assumed to have size num_bins + 1
 
@@ -46,7 +46,7 @@ public:
 		}
 	}
 
-	VarBins(string config_str)
+	VarBinner(string config_str)
 	{
 		//Assumes config_str is formatted as
 		//config_str = "name:expr:edges[0]:...:edges[num_edges-1]"
@@ -103,19 +103,24 @@ public:
 		bins.push_back(pair<float, float>(stof(temp1), stof(temp2)));
 	}
 
+	int Size()
+	{
+		return bins.size();
+	}
+
 	float min(int i)
 	{
 		if(i < 0)
 		{
-			cout << "In VarCut::min(int i):" << endl;
+			cout << "In VarBinner::min(int i):" << endl;
 			cout << "i < 0, using i = 0" << endl;
 			i = 0;
 		}
-		if(i > (int)bins.size() - 1)
+		if(i > Size() - 1)
 		{
-			cout << "In VarCut::min(int i):" << endl;
-			cout << "i > bounds.size()-1, using i = bounds.size()-1" << endl;
-			i = (int)bins.size() - 1;
+			cout << "In VarBinner::min(int i):" << endl;
+			cout << "i > Size()-1, using i = Size()-1" << endl;
+			i = Size() - 1;
 		}
 
 		return bins[i].first;
@@ -125,23 +130,18 @@ public:
 	{
 		if(i < 0)
 		{
-			cout << "In VarCut::max(int i):" << endl;
+			cout << "In VarBinner::max(int i):" << endl;
 			cout << "i < 0, using i = 0" << endl;
 			i = 0;
 		}
-		if(i > (int)bins.size() - 1)
+		if(i > Size() - 1)
 		{
-			cout << "In VarCut::max(int i):" << endl;
-			cout << "i > bounds.size()-1, using i = bounds.size()-1" << endl;
-			i = (int)bins.size() - 1;
+			cout << "In VarBinner::max(int i):" << endl;
+			cout << "i > Size()-1, using i = Size()-1" << endl;
+			i = Size() - 1;
 		}
 
 		return bins[i].second;
-	}
-
-	int Size()
-	{
-		return bins.size();
 	}
 
 	void AddBin(float min, float max)
@@ -150,61 +150,69 @@ public:
 	}
 };
 
-
-
 class Binner
 {
 private:
 	int i, j;
 	float f;
 	bool b;
-public:
+
+	vector<VarBinner> var_binners = {};
+	vector<StrFunction<float>*> var_strfuncs = {};
+	vector<int> indexes = {};
+
 	CommonFunctions<float>* cf = {};
 	TNtuple* nt;
 
-	//Maybe wrap these into a vector<tuple<VarCut, int, StrFunction<float>*>>?
-	vector<VarBins> var_bins = {};
-	vector<StrFunction<float>*> var_funcs = {};
-	vector<int> indexes = {};
+	vector<string> branch_names = {};
+	float* branch_vals;
 
-	Binner()
-	{
-		cf = new CommonFunctions<float>();
-		nt = 0x0;		
-
-		i = 0; j = 0;
-		f = 0.0;
-		b = false;
-	}
-
+public:
 	void Free()
 	{
 		//Free memory that would have been allocated previously
-		for(i = 0; i < (int)var_funcs.size(); i++)
+		for(i = 0; i < (int)var_strfuncs.size(); i++)
 		{
-			var_funcs[i]->Free();
-			delete var_funcs[i];
+			if(var_strfuncs[i] != 0x0)
+			{
+				var_strfuncs[i]->Free();
+				delete var_strfuncs[i];
+				var_strfuncs[i] = 0x0;
+			}
+			
 		}
 		var_funcs.clear();
+
+		if(branch_vals != 0x0)
+		{
+			delete branch_vals;
+			branch_vals = 0x0;
+		}
+
+		if(nt != 0x0)
+		{
+			nt->ResetBranchAddresses();
+		}
+		nt = 0x0;
 	}
 
-	void AddVar(VarBins vb)
+	void AddVarBinner(VarBinner vb)
 	{
-		var_bins.push_back(vb);
+		var_binners.push_back(vb);
 		indexes.push_back(0);
 	}
 
-	int NumVars()
+	int NumBinners()
 	{
-		return var_bins.size();
+		return var_binners.size();
 	}
 
 	int NumBins()
 	{
 		j = 1;
-		for(i = 0; i < NumVars(); i++)
+		for(i = 0; i < NumBinners(); i++)
 		{
-			j *= var_bins[i].Size();
+			j *= var_binners[i].Size();
 		}
 
 		return j;
@@ -214,33 +222,21 @@ public:
 	{
 		j = NumBins();
 		
-		for(i = NumVars()-1; i >= 0; i--)
+		for(i = NumBinners()-1; i >= 0; i--)
 		{
-			j /= var_bins[i].Size();
+			j /= var_binners[i].Size();
 			indexes[i] = (int)(k / j);
 			k %= j;
 		}
 	}
 
-	void SetNtuple(TNtuple* ntuple)
+	bool Check(int k = -1)
 	{
-		//This must be called AFTER addressing the branches of tree in the main program
-		//With some extra trickery, though, it might not have to but I'm not doing that just yet
-		Free();
+		if(k > -1)Index(k);
 
-		nt = ntuple;
-
-		for(i = 0; i < NumVars(); i++)
-		{
-			var_funcs.push_back(new StrFunction<float>(var_bins[i].expr, cf->common_funcs, nt));
-		}
-	}
-
-	bool Check()
-	{
 		if(nt == 0x0)
 		{
-			cout << "In Cutter::Check(vector<int> indexes):" << endl;
+			cout << "In Cutter::Check(int i):" << endl;
 			cout << "TNtuple* nt was null during call" << endl;
 			cout << "Returning false" << endl;
 			return false;
@@ -250,22 +246,25 @@ public:
 		for(i = 0; i < NumBins(); i++)
 		{
 			j = indexes[i];
-			f = var_funcs[i]->Evaluate();
-			if(!(var_cuts[i].min(j) <= f and f < var_cuts[i].max(j)))b = false;
+			f = var_strfuncs[i]->Evaluate();
+			if(!(var_binners[i].min(j) <= f and f < var_binners[i].max(j)))b = false;
 		}
 
 		return b;
 	}
 
-	void Write(char* c, string f = "%s_%+08.3f_%+08.3f_")
+	string Write(int k = -1, string f = "%s_%+08.3f_%+08.3f_")
 	{
+		if(k > -1)Index(k);
+
 		char temp[MAX_CHAR_LEN];
-		strcpy(c, "");
-		for(i = 0; i < var_bins.size(); i++)
+
+		string str = "";
+		for(i = 0; i < NumBinners(); i++)
 		{
 			j = indexes[i];
 
-			sprintf(temp, f.c_str(), var_bins[i].name.c_str(), var_bins[i].min(j), var_bins[i].max(j));
+			sprintf(temp, f.c_str(), var_binners[i].name.c_str(), var_binners[i].min(j), var_binners[i].max(j));
 			for(j = 0; j < MAX_CHAR_LEN; j++)
 			{
 				if(temp[j] == '+' or temp[j] == '.')
@@ -274,14 +273,119 @@ public:
 				}
 				else if(temp[j] == '-')
 				{
-					temp[j] == 'm';
+					temp[j] = 'm';
 				}
 			}
-			strcat(c, temp);
+			str += temp;
+		}
+
+		return str;
+	}
+
+	void SetUp()
+	{
+		int k;
+		bool b = false;
+		vector<string> vars = {};
+
+		branch_names.clear();
+		for(i = 0; i < NumBinners(); i++)
+		{
+			vars = GetExprVars(var_binners[i].expr)
+			for(j = 0; j < vars.size(); j++)
+			{
+				b = true;
+				for(k = 0; k < branch_names.size(); k++)
+				{
+					if(branch_names[k] == vars[j])
+					{
+						b = false;
+						break;
+					}
+				}
+
+				if(b)
+				{
+					branch_names.push_back(vars[j]);
+				}
+			}
+			vars.clear();
+		}
+
+		branch_vals = new float[branch_names.size()];
+	}
+
+	void SetNtuple(TNtuple* ntuple)
+	{
+		Free();
+
+		nt = ntuple;
+		if(nt == 0x0)
+		{
+			cout << "In Binner::SetNtuple(TNtuple* ntuple)" << endl;
+			cout << "ntuple was null, exiting" << endl;
+			return 0;
+		}
+
+		nt->SetBranchStatus("*", 0);
+		for(i = 0; i < branch_names.size(); i++)
+		{
+			if(nt->GetBranch(branch_names[i].c_str() == 0x0)
+			{
+				cout << "In Binner::SetNtuple(TNtuple* ntuple)" << endl;
+				cout << "branch \"" << branch_names[i] << "\" not found in ntuple, continuing" << endl;
+				continue;
+			}
+
+			nt->SetBranchStatus(branch_names[i].c_str(), 1);
+			nt->SetBranchAddress(branch_names[i].c_str(), &(branch_vals[i]));
+		}
+
+
+		for(i = 0; i < NumVars(); i++)
+		{
+			var_funcs.push_back(new StrFunction<float>(var_bins[i].expr, cf->common_funcs, nt));
 		}
 	}
 
-	~Cutter()
+	Binner()
+	{
+		cf = new CommonFunctions<float>();
+		nt = 0x0;		
+
+		i = 0; j = 0;
+		f = 0.0;
+		b = false;
+
+		branch_vals = 0x0;
+	}
+
+	Binner(string config_filename)
+	{
+		cf = new CommonFunctions<float>();
+		nt = 0x0;		
+
+		i = 0; j = 0;
+		f = 0.0;
+		b = false;
+
+		branch_vals = 0x0;
+
+		string config_str
+		ifstream config(config_filename)
+		while(true)
+		{
+			config >> config_str;
+
+			if(config.eof())break;
+
+			AddBinner(VarBinner(config_str));
+		}
+
+		SetUp();
+	}
+
+	~Binner()
 	{
 		Free();
 		delete cf;
