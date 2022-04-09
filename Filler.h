@@ -183,6 +183,11 @@ public:
 		fill_strfunc = new StrFunction<float>(fill_expr, cf->common_funcs, nt);
 	}
 
+	void TryFill(int k=-1, TH1* h)
+	{
+		if(Check(k))h->Fill(fill_strfunc->Evaluate());
+	}
+
 	Filler()
 	{
 		cf = new CommonFunctions<float>();
