@@ -188,6 +188,11 @@ public:
 		if(Check(k))h->Fill(fill_strfunc->Evaluate());
 	}
 
+	void TryFill(int k=-1, TH1** h)
+	{
+		if(Check(k))h[k]->Fill(fill_strfunc->Evaluate());
+	}
+
 	Filler()
 	{
 		cf = new CommonFunctions<float>();
