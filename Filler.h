@@ -252,7 +252,7 @@ public:
 		SetUp();
 	}
 
-	~Binner()
+	~Filler()
 	{
 		Free();
 		delete cf;
