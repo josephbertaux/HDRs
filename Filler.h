@@ -218,7 +218,7 @@ public:
 
 	Filler(string config_filename)
 	{
-		cout << "Reading Filler from config file" << endl;
+		cout << "Reading Filler from config file " << config_filename << endl;
 
 		cf = new CommonFunctions<float>();
 		nt = 0x0;		

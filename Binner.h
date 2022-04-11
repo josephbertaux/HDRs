@@ -53,7 +53,7 @@ public:
 		
 		int i = 0;
 		
-		cout << "Making VarBinner from config file: " << config_str << endl;
+		cout << "Making VarBinner from string: " << config_str << endl;
 		
 		cout << "Name: ";
 		name = "";
