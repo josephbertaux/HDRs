@@ -240,12 +240,18 @@ public:
 	{
 		if(arg_vals == 0x0)
 		{
-			cout << "Expression: " << expr << " has unallocated arg_vals" << endl;
+			cout << "Expression: " << expr << endl;
+			cout << " has unallocated arg_vals" << endl;
+			cout << endl;
+
 			return (T)0.0;
 		}
 		if(named_func == 0x0)
 		{
-			cout << "Expression: " << expr << " has unresolved outermost function" << endl;
+			cout << "Expression: " << expr << endl;
+			cout << " has unresolved outermost function" << endl;
+			cout << endl;
+
 			return (T)0.0;
 		}
 
@@ -253,7 +259,10 @@ public:
 		{
 			if(arg_funcs[i] == 0x0)
 			{
-				cout << "Expression: " << expr << " has null argument" << endl;
+				cout << "Expression: " << expr << endl;
+				cout << " has null argument " << i << endl;
+				cout << endl;
+
 				arg_vals[i] = (T)0.0;
 			}
 			else
