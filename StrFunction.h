@@ -255,9 +255,11 @@ public:
 			{
 				cout << "Expression: " << expr << " has null argument" << endl;
 				arg_vals[i] = (T)0.0;
-				continue;
 			}
-			arg_vals[i] = arg_funcs[i]->Evaluate();
+			else
+			{
+				arg_vals[i] = arg_funcs[i]->Evaluate();
+			}
 		}
 
 		return named_func->func(arg_vals);

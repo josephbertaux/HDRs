@@ -99,6 +99,8 @@ public:
 
 	void SetUp()
 	{
+		Free();
+
 		int k;
 		bool b = false;
 		vector<string> vars = {};

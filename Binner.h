@@ -284,6 +284,8 @@ public:
 
 	void SetUp()
 	{
+		Free();
+
 		int k;
 		bool b = false;
 		vector<string> vars = {};
@@ -311,7 +313,6 @@ public:
 			}
 			vars.clear();
 		}
-
 
 		branch_vals = new float[branch_names.size()];
 	}
