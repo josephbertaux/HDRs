@@ -42,7 +42,7 @@ public:
 
 		for(int i = 0; i < num_edges-1; i++)
 		{
-			bin.push_back(pair<float, float>(edges[i], edges[i+1]));
+			bins.push_back(pair<float, float>(edges[i], edges[i+1]));
 		}
 	}
 
@@ -146,7 +146,7 @@ public:
 
 	void AddBin(float min, float max)
 	{
-		bounds.push_back(pair<float, float>(min, max));
+		bins.push_back(pair<float, float>(min, max));
 	}
 };
 
@@ -181,7 +181,7 @@ public:
 			}
 			
 		}
-		var_funcs.clear();
+		var_strfuncs.clear();
 
 		if(branch_vals != 0x0)
 		{
@@ -291,7 +291,7 @@ public:
 		branch_names.clear();
 		for(i = 0; i < NumBinners(); i++)
 		{
-			vars = GetExprVars(var_binners[i].expr)
+			vars = GetExprVars(var_binners[i].expr);
 			for(j = 0; j < vars.size(); j++)
 			{
 				b = true;
