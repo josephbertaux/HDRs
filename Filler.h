@@ -97,6 +97,28 @@ public:
 		return str;
 	}
 
+	void PrintVarVals()
+	{
+		if(fill_strfunc == 0x0)
+		{
+			cout << "Fill StrFunction was null during call, skipping" << endl;
+		}
+		else
+		{
+			cout << "Fill value \"" << fill_name << "\": " << fill_strfunc->Evaluate() << endl;
+		}
+
+		for(i = 0; i < var_binners.size(); i++)
+		{
+			if(var_strfuncs[i] == 0x0)
+			{
+				cout << "var_binners[" << i << "] was null, skipping" << endl;
+				continue;
+			}
+			cout << var_binners[i].name << ": " << var_strfuncs[i]->Evaluate() << endl;
+		}
+	}
+
 	void SetUp()
 	{
 		Free();
