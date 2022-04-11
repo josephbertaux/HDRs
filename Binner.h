@@ -196,7 +196,7 @@ public:
 		nt = 0x0;
 	}
 
-	void AddVarBinner(VarBinner vb)
+	void AddBinner(VarBinner vb)
 	{
 		var_binners.push_back(vb);
 		indexes.push_back(0);
@@ -342,9 +342,9 @@ public:
 		}
 
 
-		for(i = 0; i < NumVars(); i++)
+		for(i = 0; i < NumBinners(); i++)
 		{
-			var_funcs.push_back(new StrFunction<float>(var_bins[i].expr, cf->common_funcs, nt));
+			var_funcs.push_back(new StrFunction<float>(var_binners[i].expr, cf->common_funcs, nt));
 		}
 	}
 
