@@ -51,7 +51,7 @@ public:
 		if(fill_strfunc != 0x0)
 		{
 			fill_strfunc->Free();
-			delete fill_strfunc();
+			delete fill_strfunc;
 		}
 
 		if(branch_vals != 0x0)
@@ -73,7 +73,7 @@ public:
 
 		char temp[MAX_CHAR_LEN];
 
-		string str = fill_var_name;
+		string str = fill_name;
 		for(i = 0; i < NumBinners(); i++)
 		{
 			j = indexes[i];
@@ -105,7 +105,7 @@ public:
 		branch_names.clear();
 		for(i = 0; i < NumBinners(); i++)
 		{
-			vars = GetExprVars(var_binners[i].expr)
+			vars = GetExprVars(var_binners[i].expr);
 			for(j = 0; j < vars.size(); j++)
 			{
 				b = true;
