@@ -206,7 +206,7 @@ public:
 		fill_strfunc = new StrFunction<float>(fill_expr, cf->common_funcs, nt);
 	}
 
-	void TryFill(int k=-1, TH1* h=0x0)
+	void TryFill(TH1* h, int k=-1)
 	{
 		if(h == 0x0)
 		{
