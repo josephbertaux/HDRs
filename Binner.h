@@ -344,7 +344,7 @@ public:
 
 		for(i = 0; i < NumBinners(); i++)
 		{
-			var_funcs.push_back(new StrFunction<float>(var_binners[i].expr, cf->common_funcs, nt));
+			var_strfuncs.push_back(new StrFunction<float>(var_binners[i].expr, cf->common_funcs, nt));
 		}
 	}
 

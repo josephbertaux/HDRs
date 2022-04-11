@@ -21,11 +21,10 @@
 #include "Binner.h"
 
 //Definitions
-static int MAX_CHAR_LEN = 256;
 
 using namespace std;
 
-class Filler :: Binner
+class Binner :: Filler
 {
 private:
 	StrFunction* fill_strfunc;
