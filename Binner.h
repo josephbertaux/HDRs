@@ -312,13 +312,12 @@ public:
 			vars.clear();
 		}
 
+
 		branch_vals = new float[branch_names.size()];
 	}
 
 	void SetNtuple(TNtuple* ntuple)
 	{
-		Free();
-
 		nt = ntuple;
 		if(nt == 0x0)
 		{

@@ -151,8 +151,6 @@ public:
 
 	void SetNtuple(TNtuple* ntuple)
 	{
-		Free();
-
 		nt = ntuple;
 		if(nt == 0x0)
 		{
