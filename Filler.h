@@ -60,12 +60,6 @@ public:
 		        delete branch_vals;
 		        branch_vals = 0x0;
 		}
-
-		if(nt != 0x0)
-		{
-		        nt->ResetBranchAddresses();
-		}
-		nt = 0x0;
         }
 
 	string Write(int k = -1, string f = "_%s_%+08.3f_%+08.3f")
