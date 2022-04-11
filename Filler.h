@@ -24,7 +24,7 @@
 
 using namespace std;
 
-class Binner :: Filler
+class Filler: public Binner
 {
 private:
 	StrFunction* fill_strfunc;
