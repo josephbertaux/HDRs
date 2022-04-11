@@ -256,7 +256,7 @@ public:
 		}
 
 		b = true;
-		for(i = 0; i < NumBins(); i++)
+		for(i = 0; i < NumBinners(); i++)
 		{
 			j = indexes[i];
 			if(var_strfuncs[i] == 0x0)
@@ -267,9 +267,7 @@ public:
 
 				return false;
 			}
-			cout << "here" << endl;
 			f = var_strfuncs[i]->Evaluate();
-			cout << f << endl;
 			if(!(var_binners[i].min(j) <= f and f < var_binners[i].max(j)))b = false;
 		}
 
