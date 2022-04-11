@@ -192,6 +192,13 @@ public:
 			cout << endl;
 			return;
 		}
+
+		if(fill_strfunc == 0x0)
+		{
+			cout << "In Filler::TryFill, fill_strfunc is null" << endl;
+			cout << endl;
+			return;
+		}
 		if(Check(k))h->Fill(fill_strfunc->Evaluate());
 	}
 
