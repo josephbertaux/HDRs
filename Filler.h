@@ -202,7 +202,7 @@ public:
 
 		for(i = 0; i < var_strfuncs.size(); i++)
 		{
-			cout << var_strfuncs->Evaluate() << endl;
+			cout << var_strfuncs[i]->Evaluate() << endl;
 		}
 		cout << "here" << endl;
 
