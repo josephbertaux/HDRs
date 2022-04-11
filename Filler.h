@@ -218,6 +218,8 @@ public:
 
 	Filler(string config_filename)
 	{
+		cout << "Reading Filler from config file" << endl;
+
 		cf = new CommonFunctions<float>();
 		nt = 0x0;		
 
@@ -233,7 +235,8 @@ public:
 
 		config >> config_str;
 		if(config.eof())return;
-
+		
+		cout << "Name: ";
 		fill_name = "";
 		while(i < config_str.length())
 		{
@@ -245,8 +248,10 @@ public:
 			fill_name += config_str.substr(i,1);
 			i++;
 		}
+		cout << fill_name << endl;
 		i++;
 
+		cout << "Expression: ";
 		fill_expr = "";
 		while(i < config_str.length())
 		{
@@ -258,6 +263,8 @@ public:
 			fill_expr += config_str.substr(i,1);
 			i++;
 		}
+		cout << fill_expr << endl;
+		cout << endl;
 
 		while(true)
 		{

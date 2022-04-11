@@ -53,6 +53,9 @@ public:
 		
 		int i = 0;
 		
+		cout << "Making VarBinner from config file: " << config_str << endl;
+		
+		cout << "Name: ";
 		name = "";
 		while(i < config_str.length())
 		{
@@ -61,8 +64,10 @@ public:
 			name += config_str.substr(i, 1);
 			i++;
 		}
+		cout << name << endl;
 		i++;
 
+		cout << "Expression: ";
 		expr = "";
 		while(i < config_str.length())
 		{
@@ -71,6 +76,7 @@ public:
 			expr += config_str.substr(i, 1);
 			i++;
 		}
+		cout << expr << endl;
 		i++;
 
 		string temp1 = "";
@@ -101,6 +107,13 @@ public:
 		}
 
 		bins.push_back(pair<float, float>(stof(temp1), stof(temp2)));
+		cout << "Bins: ";
+		for(i = 0; i < bins.size(); i++)
+		{
+			cout << "(" << bins[i].first << ", " << bins[i].second << ") ";
+		}
+		cout << endl;
+		cout << endl;
 	}
 
 	int Size()
