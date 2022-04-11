@@ -200,12 +200,6 @@ public:
 			return;
 		}
 
-		for(i = 0; i < var_strfuncs.size(); i++)
-		{
-			cout << var_strfuncs[i]->Evaluate() << endl;
-		}
-		cout << "here" << endl;
-
 		if(Check(k))h->Fill(fill_strfunc->Evaluate());
 	}
 
@@ -264,7 +258,6 @@ public:
 			fill_expr += config_str.substr(i,1);
 			i++;
 		}
-		i = 0;
 
 		while(true)
 		{
