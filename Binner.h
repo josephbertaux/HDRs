@@ -249,7 +249,7 @@ public:
 
 		if(nt == 0x0)
 		{
-			cout << "In Cutter::Check(int i):" << endl;
+			cout << "In Binner::Check(int i):" << endl;
 			cout << "TNtuple* nt was null during call" << endl;
 			cout << "Returning false" << endl;
 			return false;
@@ -259,6 +259,14 @@ public:
 		for(i = 0; i < NumBins(); i++)
 		{
 			j = indexes[i];
+			if(var_strfuncs[i] == 0x0)
+			{
+				cout << "In Binner::Check(int i):" << endl;
+				cout << "StrFunction var_strfuncs[" << i << "] was null" << endl;
+				cout << "Returning false" << endl;
+
+				return false;
+			}
 			f = var_strfuncs[i]->Evaluate();
 			if(!(var_binners[i].min(j) <= f and f < var_binners[i].max(j)))b = false;
 		}
@@ -293,6 +301,20 @@ public:
 		}
 
 		return str;
+	}
+
+	void PrintVarVals()
+	{
+		for(i = 0; i < NumBinners(); i++)
+		{
+			if(var_strfuncs[i] == 0x0)
+			{
+				cout << "var_strfuncs[" << i << "] was null, skipping" << endl;
+				continue;
+			}
+
+			cout << var_binners[i].name << ": " << var_strfuncs[i]->Evaluate() << endl;
+		}
 	}
 
 	void SetUp()
