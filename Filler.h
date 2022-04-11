@@ -199,6 +199,13 @@ public:
 			cout << endl;
 			return;
 		}
+
+		for(i = 0; i < var_strfuncs.size(); i++)
+		{
+			cout << var_strfuncs->Evaluate() << endl;
+		}
+		cout << "here" << endl;
+
 		if(Check(k))h->Fill(fill_strfunc->Evaluate());
 	}
 
