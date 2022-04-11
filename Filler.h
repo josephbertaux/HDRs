@@ -52,6 +52,7 @@ public:
 		{
 			fill_strfunc->Free();
 			delete fill_strfunc;
+			fill_strfunc = 0x0;
 		}
 
 		if(branch_vals != 0x0)
