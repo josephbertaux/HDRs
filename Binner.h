@@ -152,7 +152,7 @@ public:
 
 class Binner
 {
-private:
+protected:
 	int i, j;
 	float f;
 	bool b;
