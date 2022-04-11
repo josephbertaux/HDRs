@@ -388,7 +388,11 @@ public:
 	~Binner()
 	{
 		Free();
-		delete cf;
+		if(cf != 0x0)
+		{
+			delete cf;
+			cf = 0x0;
+		}
 	}
 };
 
