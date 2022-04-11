@@ -238,8 +238,25 @@ public:
 
 	T Evaluate()
 	{
+		if(arg_vals == 0x0)
+		{
+			cout << "Expression: " << expr << " has unallocated arg_vals" << endl;
+			return (T)0.0;
+		}
+		if(named_func == 0x0)
+		{
+			cout << "Expression: " << expr << " has unresolved outermost function" << endl;
+			return (T)0.0;
+		}
+
 		for(int i = 0; i < num_args; i++)
 		{
+			if(arg_funcs[i] == 0x0)
+			{
+				cout << "Expression: " << expr << " has null argument" << endl;
+				arg_vals[i] = (T)0.0;
+				continue;
+			}
 			arg_vals[i] = arg_funcs[i]->Evaluate();
 		}
 
