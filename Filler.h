@@ -27,7 +27,7 @@ using namespace std;
 class Filler: public Binner
 {
 private:
-	StrFunction* fill_strfunc;
+	StrFunction<float>* fill_strfunc;
 
 public:
 	string fill_name;
@@ -46,7 +46,7 @@ public:
 		        }
 
 		}
-		var_funcs.clear();
+		var_strfuncs.clear();
 
 		if(fill_strfunc != 0x0)
 		{
@@ -182,14 +182,15 @@ public:
 		fill_strfunc = new StrFunction<float>(fill_expr, cf->common_funcs, nt);
 	}
 
-	void TryFill(int k=-1, TH1* h)
+	void TryFill(int k=-1, TH1* h=0x0)
 	{
+		if(h == 0x0)
+		{
+			cout << "In Filler::TryFill, histogram is null" << endl;
+			cout << endl;
+			return;
+		}
 		if(Check(k))h->Fill(fill_strfunc->Evaluate());
-	}
-
-	void TryFill(int k=-1, TH1** h)
-	{
-		if(Check(k))h[k]->Fill(fill_strfunc->Evaluate());
 	}
 
 	Filler()
