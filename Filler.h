@@ -161,6 +161,7 @@ public:
 			return;
 		}
 
+		nt->ResetBranchAddresses();
 		nt->SetBranchStatus("*", 0);
 		for(i = 0; i < branch_names.size(); i++)
 		{
