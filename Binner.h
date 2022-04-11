@@ -324,13 +324,13 @@ public:
 		{
 			cout << "In Binner::SetNtuple(TNtuple* ntuple)" << endl;
 			cout << "ntuple was null, exiting" << endl;
-			return 0;
+			return;
 		}
 
 		nt->SetBranchStatus("*", 0);
 		for(i = 0; i < branch_names.size(); i++)
 		{
-			if(nt->GetBranch(branch_names[i].c_str() == 0x0)
+			if(nt->GetBranch(branch_names[i].c_str()) == 0x0)
 			{
 				cout << "In Binner::SetNtuple(TNtuple* ntuple)" << endl;
 				cout << "branch \"" << branch_names[i] << "\" not found in ntuple, continuing" << endl;
