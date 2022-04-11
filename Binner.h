@@ -268,6 +268,7 @@ public:
 				return false;
 			}
 			f = var_strfuncs[i]->Evaluate();
+			cout << f << endl;
 			if(!(var_binners[i].min(j) <= f and f < var_binners[i].max(j)))b = false;
 		}
 
