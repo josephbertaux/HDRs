@@ -68,7 +68,7 @@ public:
 		nt = 0x0;
         }
 
-	string Write(int k = -1, string f = "%s_%+08.3f_%+08.3f_")
+	string Write(int k = -1, string f = "_%s_%+08.3f_%+08.3f")
 	{
 		if(k > -1)Index(k);
 
