@@ -266,7 +266,7 @@ public:
 	~Filler()
 	{
 		Free();
-		delete cf;
+		//delete cf;
 	}
 };
 
