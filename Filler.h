@@ -174,9 +174,9 @@ public:
 			nt->SetBranchAddress(branch_names[i].c_str(), &(branch_vals[i]));
 		}
 
-		for(i = 0; i < NumVars(); i++)
+		for(i = 0; i < NumBinners(); i++)
 		{
-			var_funcs.push_back(new StrFunction<float>(var_bins[i].expr, cf->common_funcs, nt));
+			var_strfuncs.push_back(new StrFunction<float>(var_binners[i].expr, cf->common_funcs, nt));
 		}
 
 		fill_strfunc = new StrFunction<float>(fill_expr, cf->common_funcs, nt);
