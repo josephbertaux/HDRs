@@ -200,6 +200,17 @@ public:
 		fill_strfunc = new StrFunction<float>(fill_expr, cf->common_funcs, nt);
 	}
 
+	float GetFillVal()
+	{
+		if(fill_strfunc == 0x0)
+		{
+			cout << "In Filler::GetFillVal, fill_strfunc was null at call" << endl;
+			return 0.0;
+		}
+
+		return fill_strfunc->Evaluate();
+	}
+
 	void TryFill(TH1* h, int k=-1)
 	{
 		if(h == 0x0)
