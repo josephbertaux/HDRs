@@ -249,7 +249,10 @@ public:
 		string config_str;
 		ifstream config(config_filename);
 
-		config >> config_str;
+		config >> config_str; //First line is reserved for histogram
+		if(config.eof())return;
+
+		config >> config_str; //Second line contains information about the fill quantity
 		if(config.eof())return;
 		
 		cout << "Name: ";
