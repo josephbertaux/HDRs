@@ -27,11 +27,13 @@ using namespace std;
 
 class VarBinner
 {
+protected:
+	vector<pair<float, float>> bins;
+	int index;
+
 public:
 	string name; //The name of the cut when writing short strings to specify the range used for a specific application of this cut
 	string expr; //The name of a branch (or StrFunction expression of branches) used to compare to bin edges
-
-	vector<pair<float, float>> bins; //The edges of bins
 
 	VarBinner(string n, string expression, int num_edges, float edges[])
 	{
@@ -39,6 +41,7 @@ public:
 
 		name = n;
 		expr = expression;
+		index = 0;
 
 		for(int i = 0; i < num_edges-1; i++)
 		{
@@ -51,6 +54,8 @@ public:
 		//Assumes config_str is formatted as
 		//config_str = "name:expr:edges[0]:...:edges[num_edges-1]"
 		
+		index = 0;
+
 		int i = 0;
 		
 		cout << "Making VarBinner from string: " << config_str << endl;
@@ -116,45 +121,54 @@ public:
 		cout << endl;
 	}
 
+	void SetIndex(int i)
+	{
+		if(0 <= i and i < Size())
+		{
+			index = i;
+		}
+	}
+
+	int GetIndex()
+	{
+		return index;
+	}
+
 	int Size()
 	{
 		return bins.size();
 	}
 
-	float min(int i)
+	float Min(int i = -1)
 	{
-		if(i < 0)
+		if(0 <= i and i < Size())
 		{
-			cout << "In VarBinner::min(int i):" << endl;
-			cout << "i < 0, using i = 0" << endl;
-			i = 0;
-		}
-		if(i > Size() - 1)
-		{
-			cout << "In VarBinner::min(int i):" << endl;
-			cout << "i > Size()-1, using i = Size()-1" << endl;
-			i = Size() - 1;
+			index = i;
 		}
 
-		return bins[i].first;
+		if(0 <= index and index < Size())
+		{
+			return bins[index].first;
+		}
+
+		cout << "Error in VarBinner::Min(), index out of bounds" << endl;
+		return 0.0;
 	}
 
-	float max(int i)
+	float Max(int i = -1)
 	{
-		if(i < 0)
+		if(0 <= i and i < Size())
 		{
-			cout << "In VarBinner::max(int i):" << endl;
-			cout << "i < 0, using i = 0" << endl;
-			i = 0;
-		}
-		if(i > Size() - 1)
-		{
-			cout << "In VarBinner::max(int i):" << endl;
-			cout << "i > Size()-1, using i = Size()-1" << endl;
-			i = Size() - 1;
+			index = i;
 		}
 
-		return bins[i].second;
+		if(0 <= index and index < Size())
+		{
+			return bins[index].first;
+		}
+
+		cout << "Error in VarBinner::Max(), index out of bounds" << endl;
+		return 0.0;
 	}
 
 	void AddBin(float min, float max)
@@ -172,7 +186,6 @@ protected:
 
 	vector<VarBinner> var_binners = {};
 	vector<StrFunction<float>*> var_strfuncs = {};
-	vector<int> indexes = {};
 
 	CommonFunctions<float>* cf = {};
 	TNtuple* nt;
@@ -206,7 +219,17 @@ public:
 	void AddBinner(VarBinner vb)
 	{
 		var_binners.push_back(vb);
-		indexes.push_back(0);
+	}
+
+	VarBinner& GetBinner(string name)
+	{
+		for(i = 0; i < var_binners.size(); i++)
+		{
+			if(var_binners[i].name == name)
+			{
+				return var_binners[i];
+			}
+		}
 	}
 
 	int NumBinners()
@@ -232,7 +255,7 @@ public:
 		for(i = NumBinners()-1; i >= 0; i--)
 		{
 			j /= var_binners[i].Size();
-			indexes[i] = (int)(k / j);
+			VarBinners[i].SetIndex(k / j);
 			k %= j;
 		}
 	}
@@ -262,7 +285,7 @@ public:
 				return false;
 			}
 			f = var_strfuncs[i]->Evaluate();
-			if(!(var_binners[i].min(j) <= f and f < var_binners[i].max(j)))b = false;
+			if(!(var_binners[i].Min() <= f and f < var_binners[i].Max()))b = false;
 		}
 
 		return b;
@@ -277,9 +300,7 @@ public:
 		string str = "";
 		for(i = 0; i < NumBinners(); i++)
 		{
-			j = indexes[i];
-
-			sprintf(temp, f.c_str(), var_binners[i].name.c_str(), var_binners[i].min(j), var_binners[i].max(j));
+			sprintf(temp, f.c_str(), var_binners[i].name.c_str(), var_binners[i].Min(), var_binners[i].Max());
 			for(j = 0; j < MAX_CHAR_LEN; j++)
 			{
 				if(temp[j] == '+' or temp[j] == '.')
