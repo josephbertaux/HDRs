@@ -269,7 +269,7 @@ public:
 		for(i = NumBinners()-1; i >= 0; i--)
 		{
 			j /= var_binners[i].Size();
-			VarBinners[i].SetIndex(k / j);
+			var_binners[i].SetIndex(k / j);
 			k %= j;
 		}
 	}
@@ -289,7 +289,6 @@ public:
 		b = true;
 		for(i = 0; i < NumBinners(); i++)
 		{
-			j = indexes[i];
 			if(var_strfuncs[i] == 0x0)
 			{
 				cout << "In Binner::Check(int i):" << endl;
