@@ -164,7 +164,7 @@ public:
 
 		if(0 <= index and index < Size())
 		{
-			return bins[index].first;
+			return bins[index].second;
 		}
 
 		cout << "Error in VarBinner::Max(), index out of bounds" << endl;
