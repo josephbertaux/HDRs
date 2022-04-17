@@ -175,6 +175,20 @@ public:
 	{
 		bins.push_back(pair<float, float>(min, max));
 	}
+
+	void SetBinBounds(float min, float max, int i = -1)
+	{
+		if(0 <= i and i < Size())
+		{
+			index = i;
+		}
+
+		if(0 <= index and index < Size())
+		{
+			bins[index].first = min;
+			bins[index].second = max;
+		}
+	}
 };
 
 class Binner
