@@ -171,6 +171,29 @@ public:
 		return 0.0;
 	}
 
+	string Write(int k = -1, string f = "_%s_%+08.3f_%+08.3f")
+	{
+		SetIndex(k);
+		char temp[MAX_CHAR_LEN];
+
+		string str = "";
+		sprintf(temp, f.c_str(), name, Min(), Max());
+		for(int i = 0; i < MAX_CHAR_LEN; i++)
+		{
+			if(temp[i] == '+' or temp[i] == '.')
+			{
+				temp[i] = 'p';
+			}
+			else if(temp[i] == '-')
+			{
+				temp[i] = 'm';
+			}
+		}
+		str += temp;
+
+		return str;
+	}
+
 	void AddBin(float min, float max)
 	{
 		bins.push_back(pair<float, float>(min, max));
