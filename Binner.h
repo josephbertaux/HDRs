@@ -177,7 +177,7 @@ public:
 		char temp[MAX_CHAR_LEN];
 
 		string str = "";
-		sprintf(temp, f.c_str(), name, Min(), Max());
+		sprintf(temp, f.c_str(), name.c_str(), Min(), Max());
 		for(int i = 0; i < MAX_CHAR_LEN; i++)
 		{
 			if(temp[i] == '+' or temp[i] == '.')
