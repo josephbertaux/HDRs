@@ -258,15 +258,17 @@ public:
 		var_binners.push_back(vb);
 	}
 
-	VarBinner& GetBinner(string name)
+	VarBinner* GetBinner(string name)
 	{
 		for(i = 0; i < var_binners.size(); i++)
 		{
 			if(var_binners[i].name == name)
 			{
-				return var_binners[i];
+				return &(var_binners[i]);
 			}
 		}
+
+		return 0x0;
 	}
 
 	int NumBinners()
