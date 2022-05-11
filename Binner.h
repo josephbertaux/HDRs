@@ -38,7 +38,7 @@ public:
 	VarBinner()
 	{
 		name = "";
-		exper = "";
+		expr = "";
 		index = 0;
 
 		bins.clear();
