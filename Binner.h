@@ -35,6 +35,15 @@ public:
 	string name; //The name of the cut when writing short strings to specify the range used for a specific application of this cut
 	string expr; //The name of a branch (or StrFunction expression of branches) used to compare to bin edges
 
+	VarBinner()
+	{
+		name = "";
+		exper = "";
+		index = 0;
+
+		bins.clear();
+	}
+
 	VarBinner(string n, string expression, int num_edges, float edges[])
 	{
 		//edges assumed to have size num_bins + 1
