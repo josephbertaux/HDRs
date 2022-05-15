@@ -365,7 +365,7 @@ public:
 		return str;
 	}
 
-	float GetVarVals(string name)
+	float GetVarVal(string name)
 	{
 		for(i = 0; i < var_binners.size(); i++)
 		{
