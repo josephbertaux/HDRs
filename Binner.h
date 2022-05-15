@@ -365,6 +365,28 @@ public:
 		return str;
 	}
 
+	float GetVarVals(string name)
+	{
+		for(i = 0; i < var_binners.size(); i++)
+		{
+			if(var_binners[i].name == name)
+			{
+				j = i;
+				break;
+			}
+		}
+
+		if(var_strfuncs[j] == 0x0)
+		{
+			cout << name << "'s strfunc was null" << endl;
+			cout << "returning 0.0" << endl;
+
+			return 0.0;
+		}
+
+		return var_strfuncs[i]->Evaluate();
+	}
+
 	void PrintVarVals()
 	{
 		for(i = 0; i < NumBinners(); i++)
