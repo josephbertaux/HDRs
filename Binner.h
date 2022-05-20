@@ -492,7 +492,8 @@ public:
 		branch_vals = 0x0;
 
 		string config_str;
-		ifstream config(config_filename);
+		ifstream config;
+		config.open(config_filename, ifstream::in);
 		while(true)
 		{
 			config >> config_str;
@@ -501,6 +502,7 @@ public:
 
 			AddBinner(VarBinner(config_str));
 		}
+		config.close();
 
 		SetUp();
 	}
