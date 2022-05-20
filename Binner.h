@@ -492,7 +492,7 @@ public:
 		branch_vals = 0x0;
 
 		string config_str;
-		ifstream config.open(config_filename, ifstream::in);
+		ifstream config(config_filename, ifstream::in);
 
 		if(config.fail())
 		{
