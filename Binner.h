@@ -494,15 +494,26 @@ public:
 		string config_str;
 		ifstream config;
 		config.open(config_filename, ifstream::in);
+
+		if(config.fail())
+		{
+			cout << "Could not open file:" << endl;
+			cout << config_filename << endl;
+
+			return;
+		}
+
 		config.clear();
 		config.seekg(0, ios::beg);
 		while(true)
 		{
 			config >> config_str;
 
-			if(config.eof())break;
+			//if(config.eof())break;
 
 			AddBinner(VarBinner(config_str));
+
+			if(config.peek())break;
 		}
 		config.close();
 
