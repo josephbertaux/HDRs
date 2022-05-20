@@ -494,6 +494,8 @@ public:
 		string config_str;
 		ifstream config;
 		config.open(config_filename, ifstream::in);
+		config.clear();
+		config.seekg(0, ios::beg);
 		while(true)
 		{
 			config >> config_str;
